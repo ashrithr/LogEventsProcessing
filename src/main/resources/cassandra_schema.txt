@@ -1,0 +1,11 @@
+drop keyspace Logging;
+
+create keyspace Logging;
+
+use Logging;
+
+create column family LogVolumeByMinute
+with column_type = 'Standard'
+and comparator = 'UTF8Type'
+and default_validation_class = 'CounterColumnType'
+and key_validation_class = 'UTF8Type';
