@@ -32,4 +32,5 @@ public class Conf {
   public static final String CASSANDRA_HOST = "localhost:9160";
   public static final String CASSANDRA_KEYSPACE = "Logging";
   public static final String CASSANDRA_COUNT_CF_NAME = "LogVolumeByMinute";
+  public static final String CASSANDRA_STATUS_CF_NAME = "StautusCodesCount";
 }

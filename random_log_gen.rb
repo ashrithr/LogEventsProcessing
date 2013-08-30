@@ -42,6 +42,8 @@ class IPGenerator
 end
 
 class LogGenerator
+  attr_accessor :messages_count
+
   EXTENSIONS = {
     'html' => 40,
     'php' => 30,
@@ -64,14 +66,15 @@ class LogGenerator
 
   def initialize(ipgen)
     @ipgen = ipgen
+    @messages_count = 1
   end
 
-  def write_qps(dest, sleep_secs)
-    # sleep = 1.0 / qps
-    sleep = sleep_secs
+  def write_qps(dest, qps)
+    sleep = 1.0 / qps
     loop do
       write(dest, 1)
       sleep(sleep)
+      @messages_count += 1
     end
   end
 
@@ -108,12 +111,12 @@ end
 
 options = {}
 optparse = OptionParser.new do |opts|
-  opts.banner = "Usage: #{$PROGRAM_NAME} -s <sleep time> -c <output to console> -f <output file path>"
+  opts.banner = "Usage: #{$PROGRAM_NAME} -s <messages per second> -c <output to console> -f <output file path>"
   opts.on( '-c', '--console', 'Output to stdout') do
     options[:console] = true
   end
-  opts.on('-s', '--sleep <sleep time>', 'Sleep time between messages in seconds') do |secs|
-    options[:sleep] = secs
+  opts.on('-q', '--quantity <msgs/sec>', 'Messages to generate per second') do |quantity|
+    options[:quantity] = quantity
   end
   opts.on('-f', '--file <file path>', 'File path where to write log messages') do |path|
     options[:file] = path
@@ -121,8 +124,8 @@ optparse = OptionParser.new do |opts|
   end
   opts.on('-h', '--help', 'Display this screen') do
     puts opts
-    puts "Usage Ex: Generate random apache log data to file and sleep 100 ms between messages"
-    puts "#{$PROGRAM_NAME} -s 0.1 -f /tmp/apache.log"
+    puts "Usage Ex: Generate random apache log data to file generating 24 messages per second"
+    puts "#{$PROGRAM_NAME} -q 24 -f /tmp/apache.log"
     exit
   end
 end
@@ -137,7 +140,7 @@ end
 
 default_opts = {
   :console => true,
-  :sleep => 0.1,
+  :quantity => 1,
   :file => '/tmp/apache.log'
 }.merge(options)
 
@@ -148,7 +151,7 @@ output_dest = if default_opts[:console]
               end
 
 p default_opts
-puts "[DEBUG]: Writing output to '#{output_dest}' with sleep time of '#{default_opts[:sleep]}' seconds in between messgaes"
+puts "[DEBUG]: Writing output to '#{output_dest}' generating '#{default_opts[:quantity]}' messgae(s) per second"
 unless default_opts[:console]
   unless File.exists?(File.expand_path(output_dest))
     require 'fileutils'
@@ -162,10 +165,12 @@ begin
   output_dest = File.open(default_opts[:file], 'w') unless default_opts[:console]
   puts "[DEBUG]: Init data generator, press ^C to exit"
   output_dest.sync = true
-  LogGenerator.new(IPGenerator.new(100, 10)).write_qps(output_dest, default_opts[:sleep].to_i)
+  @log_generator = LogGenerator.new(IPGenerator.new(100, 10))
+  @log_generator.write_qps(output_dest, default_opts[:quantity].to_i)
   output_dest.close unless default_opts[:console]
 rescue Interrupt
   puts "Caught interrupt, aborting!"
 ensure
+  puts "Number of messages generated: #{@log_generator.messages_count}"
   output_dest.close unless default_opts[:console]
 end

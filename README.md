@@ -78,15 +78,16 @@ How to run in local mode:
 1. Start a local instance of kafka & zookeeper, for [installation instructions](http://kafka.apache.org/)
 
   ```
-  bin/zookeeper-server-start.sh config/zookeeper.properties
-  bin/kafka-server-start.sh config/server.properties
+  ${KAFKA_HOME}/bin/zookeeper-server-start.sh config/zookeeper.properties
+  ${KAFKA_HOME}/bin/kafka-server-start.sh config/server.properties
   ```
 
 2. Start a local instance of logstash
 
-    - if using jar, `java -jar logstash-<version>-monolithic.jar agent -f shipper.conf`
-
-    - if using source, `bin/logstash agent -f shipper.conf`
+  ```
+  java -jar logstash-<version>-monolithic.jar agent -f shipper.conf #if using jar
+  ${LOGSTASH_HOME}/bin/logstash agent -f shipper.conf #if using source
+  ```
 
 3. Mock random apache log generation, following command will generate random http logs to `/tmp/apache.log` with a time interval of `0.1 seconds`
 
@@ -99,13 +100,13 @@ How to run in local mode:
 4. Start a local cassandra instance, for [installation instructions](http://wiki.apache.org/cassandra/GettingStarted)
 
   ```
-  $CASSANDRA_HOME/bin/cassandra -f
+  ${CASSANDRA_HOME}/bin/cassandra -f
   ```
 
 5. Create cassandra schema from file `resources/cassandra_schema.txt`:
 
   ```
-  bin/cassandra-cli -host localhost -port 9160 -f resources/cassandra_schema.txt
+  ${CASSANDRA_HOME}/bin/cassandra-cli -host localhost -port 9160 -f resources/cassandra_schema.txt
   ```
 
 6. Finally, run the storm topology in `LocalCluster` mode
