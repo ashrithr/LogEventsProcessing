@@ -1,5 +1,5 @@
 #!/bin/sh
-exec scala "$0" "$@"
+exec scala -savecompiled "$0" "$@"
 
 !#
 import scala.collection.mutable.Map
@@ -105,38 +105,42 @@ class LogGenerator(val ipGenObj: IPGenerator, var messagesCount: Int = 1) {
 	}
 }
 
+object RandomHttpLogGen extends App {
+	val usage = """
+	Usage: random_gen <file_path> <mps>
 
-val usage = """
-Usage: random_gen file_path mps
+		file_path - path of the file where to write the log events to
+		mps - messages to generate per second
 
-	file_path - path of the file where to write the log events to
-	mps 			- messages to generate per second
+	Random Http log events generator, simulates generating log events with random_ip(s)
+	"""
 
-Random Http log events generator, simulates generating log events with random_ip(s)
-"""
+	if(args.length != 2) {
+		System.err.println(usage)
+		System.exit(1)
+	}
 
-if(args.length != 2) {
-	println(usage)
-	System.exit(1)
+	val outputFile = new File(args(0))
+	val messagesPerSec = args(1).toInt
+	val outputFileWriter = new FileWriter(outputFile)
+
+	sys.addShutdownHook {
+		println("")
+		println("Caught ^C, Aborting ...")
+		println("closing file")
+		outputFileWriter.close()
+	}
+
+	try { 
+		println(s"Generating random log events to ${outputFile} @ ${messagesPerSec}/second")	
+		println("Press Ctrl-C to abort")
+		new LogGenerator(new IPGenerator(100, 10)).writeMps(outputFileWriter, messagesPerSec)
+	} catch {
+	  case e: Exception => e.printStackTrace
+	} finally {
+		println("closing file")
+		outputFileWriter.close()
+	}
 }
-val outputFile = new File(args(0))
-val messagesPerSec = args(1).toInt
-val outputFileWriter = new FileWriter(outputFile)
 
-sys.addShutdownHook {
-	println("")
-	println("Caught ^C, Aborting ...")
-	println("closing file")
-	outputFileWriter.close()
-}
-
-try { 
-	println(s"Generating random log events to ${outputFile} @ ${messagesPerSec}/second")	
-	println("Press Ctrl-C to abort")
-	new LogGenerator(new IPGenerator(100, 10)).writeMps(outputFileWriter, messagesPerSec)
-} catch {
-  case e: Exception => e.printStackTrace
-} finally {
-	println("closing file")
-	outputFileWriter.close()
-}
+RandomHttpLogGen.main(args)
