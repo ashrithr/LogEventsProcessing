@@ -1,7 +1,7 @@
 Description:
 ===========
 
-Log Processing storm topology to count the log events and persist the events, this is a example storm topology illustrating integration between storm, kafka, logstash and cassandra
+Log Processing storm topology to count the log events per minute and status codes from http logs and parallely persist the events, this is a example storm-topology, illustrating integration between storm, kafka, logstash and cassandra
 
 Dependencies:
 ============
@@ -92,7 +92,13 @@ How to run in local mode:
 3. Mock random apache log generation, following command will generate random http logs to `/tmp/apache.log` with a time interval of `0.1 seconds`
 
   ```
-  ruby random_log_gen.rb --file /tmp/apache.log --sleep 0.1
+  ruby random_log_gen.rb --file /tmp/apache.log --quantity 30
+  ```
+
+  There is also a scala variant of the random data generator, feel free to use either of them.
+
+  ```
+  ./RandomHttpLogGen.scala /tmp/apache.log 30
   ```
 
   Note: `random_log_gen.rb` can be found in project root dir, also change the values as required to match the logstash agent conf
