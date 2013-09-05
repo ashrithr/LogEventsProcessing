@@ -55,36 +55,36 @@ public class GeoStatsBolt extends BaseRichBolt{
       return "Total Count for " + countryName + " is " + Integer.toString(countryTotal) + "\n"
           +  "Cities:  " + cityStats.toString();
     }
-
   }
 
   private OutputCollector outputCollector;
-  private Map<String, CountryStats> stats = new HashMap<String, CountryStats>();
+  //  private Map<String, CountryStats> stats = new HashMap<String, CountryStats>();
+  private Map<String, Integer> countryCounts;
 
   @Override
   public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
+    this.countryCounts = new HashMap<String, Integer>();
     this.outputCollector = outputCollector;
   }
 
   @Override
   public void execute(Tuple tuple) {
     String country = tuple.getStringByField(FieldNames.COUNTRY);
-    String city = tuple.getStringByField(FieldNames.CITY);
-    if(!stats.containsKey(country)){
-      stats.put(country, new CountryStats(country));
+    int count = 0;
+    if (this.countryCounts.containsKey(country)) {
+      count = this.countryCounts.get(country);
     }
-    stats.get(country).cityFound(city);
-    outputCollector.emit(new Values(country,
-        stats.get(country).getCountryTotal(),
-        city,
-        stats.get(country).getCityTotal(city)));
+    count ++;
+    this.countryCounts.put(country, count);
+    outputCollector.emit(new Values(country, count));
   }
 
   @Override
   public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
     outputFieldsDeclarer.declare(new Fields(FieldNames.COUNTRY,
-        FieldNames.COUNTRY_TOTAL,
-        FieldNames.CITY,
-        FieldNames.CITY_TOTAL));
+        FieldNames.COUNTRY_TOTAL
+        //FieldNames.CITY,
+        //FieldNames.CITY_TOTAL
+    ));
   }
 }

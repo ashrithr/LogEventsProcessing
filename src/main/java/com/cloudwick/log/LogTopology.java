@@ -55,6 +55,12 @@ public class LogTopology {
         FieldNames.LOG_STATUS_CODE
     );
     statusPersistenceBolt.setAckStrategy(AckStrategy.ACK_ON_WRITE);
+    // casssandra bathing bolt to persist country counts
+    CassandraBatchingBolt countryStatsPersistenceBolt = new CassandraBatchingBolt(
+        Conf.CASSANDRA_COUNTRY_CF_NAME,
+        FieldNames.COUNTRY
+    );
+    countryStatsPersistenceBolt.setAckStrategy(AckStrategy.ACK_ON_WRITE);
 
     /*
      * Creates topology builder
@@ -74,7 +80,9 @@ public class LogTopology {
         new Fields(FieldNames.LOG_STATUS_CODE));
     builder.setBolt("statusCountPersistor", statusPersistenceBolt, 3).shuffleGrouping("statusCounter");
     builder.setBolt("geoLocationFinder", new GeoBolt(new IPResolver()), 3).shuffleGrouping("ipStatusParser");
-    builder.setBolt("countryStats", new GeoStatsBolt(), 3).shuffleGrouping("geoLocationFinder");
+    builder.setBolt("countryStats", new GeoStatsBolt(), 3).fieldsGrouping("geoLocationFinder",
+        new Fields(FieldNames.COUNTRY));
+    builder.setBolt("countryStatsPersistor", countryStatsPersistenceBolt, 3).shuffleGrouping("countryStats");
     builder.setBolt("printerBolt", new PrinterBolt(), 1).shuffleGrouping("countryStats");
 
     if(args!=null && args.length > 0) {

@@ -39,4 +39,6 @@ public class Conf {
   public static final String CASSANDRA_COUNT_CF_NAME = "LogVolumeByMinute";
   // cassandra column family to use for storing http status code counts
   public static final String CASSANDRA_STATUS_CF_NAME = "StautusCodesCount";
+  // cassandra column family for storing country stats
+  public static final String CASSANDRA_COUNTRY_CF_NAME = "CountryVisitsCount";
 }
