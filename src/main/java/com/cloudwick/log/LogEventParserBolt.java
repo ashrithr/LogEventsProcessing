@@ -8,17 +8,20 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * This class greps out status code from http log event
+ * This class greps out ipAddress, statusCode from http log event
  */
-public class StatusParserBolt extends BaseRichBolt {
+public class LogEventParserBolt extends BaseRichBolt {
   private OutputCollector collector;
 
-  private static String getStatusCode(String logLine) {
+  private static ArrayList<String> getStatusCode(String logLine) {
+    ArrayList<String> ipStatusCode = new ArrayList<String>();
     String logEntryPattern = "^([\\d.]+) (\\S+) (\\S+) \\[([\\w:/]+\\s[+\\-]\\d{4})\\] \"(.+?)\" (\\d{3}) (\\d+) \"([^\"]+)\" \"([^\"]+)\"$";
     int NUM_FIELDS = 9;
     Pattern p = Pattern.compile(logEntryPattern);
@@ -26,7 +29,9 @@ public class StatusParserBolt extends BaseRichBolt {
     if (!matcher.matches() || NUM_FIELDS != matcher.groupCount()) {
       return null;
     } else {
-      return matcher.group(6);
+      ipStatusCode.add(matcher.group(1));
+      ipStatusCode.add(matcher.group(6));
+      return ipStatusCode;
     }
   }
 
@@ -38,12 +43,14 @@ public class StatusParserBolt extends BaseRichBolt {
   @Override
   public void execute(Tuple tuple) {
     LogEntry entry = (LogEntry) tuple.getValueByField(FieldNames.LOG_ENTRY);
-    int statusCode = Integer.parseInt(getStatusCode(entry.getMessage()));
-    collector.emit(new Values(statusCode));
+    List<String> ipStatus = getStatusCode(entry.getMessage());
+    String ip = ipStatus.get(0);
+    String statusCode = ipStatus.get(1);
+    collector.emit(new Values(ip, statusCode));
   }
 
   @Override
   public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-    outputFieldsDeclarer.declare(new Fields("statusCode"));
+    outputFieldsDeclarer.declare(new Fields(FieldNames.LOG_IP, FieldNames.LOG_STATUS_CODE));
   }
 }

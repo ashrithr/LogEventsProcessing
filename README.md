@@ -1,7 +1,13 @@
 Description:
 ===========
 
-Log Processing storm topology to count the log events per minute and status codes from http logs and parallely persist the events, this is a example storm-topology, illustrating integration between storm, kafka, logstash and cassandra
+Log Processing storm topology for:
+
+ 1. count the log events per minute
+ 2. status codes
+ 3. find out which country & city the request is coming from
+
+from http logs and persist the events, this is a example storm-topology, illustrating integration between storm, kafka, logstash and cassandra
 
 Dependencies:
 ============
@@ -109,7 +115,7 @@ How to run in local mode:
   ${CASSANDRA_HOME}/bin/cassandra -f
   ```
 
-5. Create cassandra schema from file `resources/cassandra_schema.txt`:
+5. Create cassandra keyspace and column families from file `resources/cassandra_schema.txt`:
 
   ```
   ${CASSANDRA_HOME}/bin/cassandra-cli -host localhost -port 9160 -f resources/cassandra_schema.txt

@@ -43,16 +43,16 @@ public class LogTopology {
     config.put(CassandraBolt.CASSANDRA_HOST, Conf.CASSANDRA_HOST);
     config.put(CassandraBolt.CASSANDRA_KEYSPACE, Conf.CASSANDRA_KEYSPACE);
     // Create a bolt that writes to the "CASSANDRA_COUNT_CF_NAME" column family and uses the Tuple field
-    // "FIELD_ROW_KEY" as the row key and "FIELD_INCREMENT" as the increment value
+    // "LOG_TIMESTAMP" as the row key and "LOG_INCREMENT" as the increment value for atomic counter
     CassandraCounterBatchingBolt logPersistenceBolt = new CassandraCounterBatchingBolt(
         Conf.CASSANDRA_COUNT_CF_NAME,
-        VolumeCountBolt.FIELD_ROW_KEY,
-        VolumeCountBolt.FIELD_INCREMENT);
+        FieldNames.LOG_TIMESTAMP,
+        FieldNames.LOG_INCREMENT);
     logPersistenceBolt.setAckStrategy(AckStrategy.ACK_ON_WRITE);
     //cassandra batching bolt to persist the status codes
     CassandraBatchingBolt statusPersistenceBolt = new CassandraBatchingBolt(
         Conf.CASSANDRA_STATUS_CF_NAME,
-        StatusCountBolt.FIELD_ROW_KEY
+        FieldNames.LOG_STATUS_CODE
     );
     statusPersistenceBolt.setAckStrategy(AckStrategy.ACK_ON_WRITE);
 
@@ -68,9 +68,14 @@ public class LogTopology {
     builder.setBolt("parser", new ParseBolt(), 2).shuffleGrouping("spout");
     builder.setBolt("volumeCounterOneMin", new VolumeCountBolt(), 2).shuffleGrouping("parser");
     builder.setBolt("countPersistor", logPersistenceBolt, 2).shuffleGrouping("volumeCounterOneMin");
-    builder.setBolt("statusParser", new StatusParserBolt(), 2).shuffleGrouping("parser");
-    builder.setBolt("statusCounter", new StatusCountBolt(), 3).fieldsGrouping("statusParser", new Fields("statusCode"));
+    builder.setBolt("ipStatusParser", new LogEventParserBolt(), 2).shuffleGrouping("parser");
+    builder.setBolt("statusCounter",
+        new StatusCountBolt(), 3).fieldsGrouping("ipStatusParser",
+        new Fields(FieldNames.LOG_STATUS_CODE));
     builder.setBolt("statusCountPersistor", statusPersistenceBolt, 3).shuffleGrouping("statusCounter");
+    builder.setBolt("geoLocationFinder", new GeoBolt(new IPResolver()), 3).shuffleGrouping("ipStatusParser");
+    builder.setBolt("countryStats", new GeoStatsBolt(), 3).shuffleGrouping("geoLocationFinder");
+    builder.setBolt("printerBolt", new PrinterBolt(), 1).shuffleGrouping("countryStats");
 
     if(args!=null && args.length > 0) {
       // submit to cluster

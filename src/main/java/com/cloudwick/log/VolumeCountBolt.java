@@ -21,10 +21,6 @@ public class VolumeCountBolt extends BaseRichBolt {
   public static Logger LOG = Logger.getLogger(VolumeCountBolt.class);
   private OutputCollector collector;
 
-  public static final String FIELD_ROW_KEY = "RowKey";
-  public static final String FIELD_COLUMN = "Column";
-  public static final String FIELD_INCREMENT = "IncrementAmount";
-
   public static Long getMinuteForTime(Date time) {
     Calendar c = Calendar.getInstance();
     c.setTime(time);
@@ -46,6 +42,6 @@ public class VolumeCountBolt extends BaseRichBolt {
 
   @Override
   public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-    outputFieldsDeclarer.declare(new Fields(FIELD_ROW_KEY, FIELD_COLUMN, FIELD_INCREMENT));
+    outputFieldsDeclarer.declare(new Fields(FieldNames.LOG_TIMESTAMP, FieldNames.LOG_COLUMN, FieldNames.LOG_INCREMENT));
   }
 }

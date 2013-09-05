@@ -21,22 +21,17 @@ import java.util.regex.Pattern;
 public class StatusCountBolt  extends BaseRichBolt {
   public static Logger LOG = Logger.getLogger(VolumeCountBolt.class);
   private OutputCollector collector;
-
-  Map<Integer, Integer> counts;
-
-  public static final String FIELD_ROW_KEY = "word";
-  public static final String FIELD_COLUMN = "count";
-
+  Map<String, Integer> counts;
 
   @Override
   public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-    this.counts = new HashMap<Integer, Integer>();
+    this.counts = new HashMap<String, Integer>();
     this.collector = outputCollector;
   }
 
   @Override
   public void execute(Tuple tuple) {
-    int statusCode = (Integer) tuple.getValues().get(0);
+    String statusCode = tuple.getStringByField(FieldNames.LOG_STATUS_CODE);
     int count = 0;
     if (this.counts.containsKey(statusCode)) {
       count = this.counts.get(statusCode);
@@ -48,6 +43,6 @@ public class StatusCountBolt  extends BaseRichBolt {
 
   @Override
   public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-    outputFieldsDeclarer.declare(new Fields(FIELD_ROW_KEY, FIELD_COLUMN));
+    outputFieldsDeclarer.declare(new Fields(FieldNames.LOG_STATUS_CODE, FieldNames.STATUS_CODE_COUNT));
   }
 }
