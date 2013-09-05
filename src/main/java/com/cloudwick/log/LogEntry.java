@@ -57,7 +57,7 @@ public class LogEntry {
   }
 
   /*
-   * the date format can vary from log entry to entry, therefore parseDate() provides a best effort approach to
+   * The date format can vary from log entry to entry, therefore parseDate() provides a best effort approach to
    * parsing the date
    */
   public Date parseDate(String value){

@@ -25,9 +25,6 @@ public class VolumeCountBolt extends BaseRichBolt {
   public static final String FIELD_COLUMN = "Column";
   public static final String FIELD_INCREMENT = "IncrementAmount";
 
-  /*
-   * returns the current minute for the time
-   */
   public static Long getMinuteForTime(Date time) {
     Calendar c = Calendar.getInstance();
     c.setTime(time);

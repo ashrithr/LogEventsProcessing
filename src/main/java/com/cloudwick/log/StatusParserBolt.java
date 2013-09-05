@@ -13,17 +13,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Author: ashrith
- * Date: 8/30/13
- * Time: 12:09 PM
- * Desc:
+ * This class greps out status code from http log event
  */
 public class StatusParserBolt extends BaseRichBolt {
   private OutputCollector collector;
 
-  /*
-   * returns the status code of the apache log event
-   */
   private static String getStatusCode(String logLine) {
     String logEntryPattern = "^([\\d.]+) (\\S+) (\\S+) \\[([\\w:/]+\\s[+\\-]\\d{4})\\] \"(.+?)\" (\\d{3}) (\\d+) \"([^\"]+)\" \"([^\"]+)\"$";
     int NUM_FIELDS = 9;

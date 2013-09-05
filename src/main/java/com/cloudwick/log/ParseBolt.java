@@ -14,7 +14,7 @@ import org.json.simple.JSONValue;
 import java.util.Map;
 
 /**
- * This bolt will parse the json events coming from spout and emits values as 'LogEntry' object
+ * This class will parse the json events coming from spout and emits values as 'LogEntry' object
  */
 public class ParseBolt extends BaseRichBolt {
   public static Logger LOG = Logger.getLogger(ParseBolt.class);

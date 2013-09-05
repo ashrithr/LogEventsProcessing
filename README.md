@@ -89,7 +89,7 @@ How to run in local mode:
   ${LOGSTASH_HOME}/bin/logstash agent -f shipper.conf #if using source
   ```
 
-3. Mock random apache log generation, following command will generate random http logs to `/tmp/apache.log` with a time interval of `0.1 seconds`
+3. Mock random apache log generation, following command will generate random http logs to `/tmp/apache.log` generating events at a rate of `30 events/sec`
 
   ```
   ruby random_log_gen.rb --file /tmp/apache.log --quantity 30
@@ -121,8 +121,8 @@ How to run in local mode:
   mvn compile exec:java -Dexec.classpathScope=compile -Dexec.mainClass=com.cloudwick.log.LogTopology
   ```
 
-Version Used:
-============
+Component versions tested on:
+============================
 * kafka - 0.7.2
 * storm - 0.8.2
 * cassandra - 1.0.12
