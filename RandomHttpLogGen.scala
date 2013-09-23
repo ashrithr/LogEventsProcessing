@@ -2,11 +2,21 @@
 exec scala -savecompiled "$0" "$@"
 
 !#
+
+/** Program to generate random apache web server log data
+ 	* @author Ashrith (ashrith at cloudwick dot com)
+ 	*/
+
 import scala.collection.mutable.Map
 import scala.util.Random
 import scala.collection.mutable.ArrayBuffer
 import java.io._
 
+/** Generates random IP address based on session information
+	* @constructor create new ipgenerator with session count and session length
+	* @param sessionsCount
+	* @param sessionLength
+	*/
 class IPGenerator(var sessionCount: Int, var sessionLength: Int) {
 	var sessions = Map[String, Int]()
 
@@ -39,6 +49,11 @@ class IPGenerator(var sessionCount: Int, var sessionLength: Int) {
 	}
 }
 
+/** Generates random logevent
+	* @constructor create new loggenrator with ipgenerator and messagescount/sec
+	* @param ipGenObj
+	* @param messagesCount
+	*/
 class LogGenerator(val ipGenObj: IPGenerator, var messagesCount: Int = 1) {
 	val EXTENSIONS = 	Map(
 			"html" -> 40,

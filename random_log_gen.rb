@@ -1,14 +1,26 @@
 #!/usr/bin/env ruby
 
+# Program to generate random apache web server log data
+# @author Ashrith (ashrith at cloudwick dot com)
+
 require 'optparse'
 
+# Generates IP addresses based on the session's count & length
+# Usage: To initialize the object
+#         @ipgen = IPGenerator.new(100, 10)
+#        To get an random ip address
+#         @ipgen.new
 class IPGenerator
+  # Initializes IPGenerator class
+  # @param [Fixnum] sessions_count
+  # @param [Fixnum] sessions_length
   def initialize(session_count, session_length)
     @session_count = session_count
     @session_length = session_length
     @sessions = {}
   end
 
+  # Returns a random ip based on the sessions count & length
   def get_ip
     session_gc
     session_create
@@ -41,6 +53,14 @@ class IPGenerator
   end
 end
 
+# Generates a log event
+# @attr_accessor [FixNum] messages_count
+# Usage: To intialize class
+#           @log_gen = LogGenerator.new(IPGenerator.new(100, 10))
+#        To generate 10 log event(s)/sec to stdout
+#           @log_gen.write_qps(STDOUT, 10)
+#        To generate 10 log event(s)/sec to file
+#           @log_gen.write_qps(File.new('/tmp/test.log', 'w'), 10)
 class LogGenerator
   attr_accessor :messages_count
 
@@ -80,12 +100,12 @@ class LogGenerator
 
   def write(dest, count)
     count.times do
-      ip = @ipgen.get_ip
-      ext = pick_weighted_key(EXTENSIONS)
+      ip        = @ipgen.get_ip
+      ext       = pick_weighted_key(EXTENSIONS)
       resp_code = pick_weighted_key(RESPONSE_CODES)
       resp_size = Kernel.rand(2 * 1024) + 192;
-      ua = pick_weighted_key(USER_AGENTS)
-      date = Time.now.strftime("%d/%b/%Y:%H:%M:%S %z")
+      ua        = pick_weighted_key(USER_AGENTS)
+      date      = Time.now.strftime("%d/%b/%Y:%H:%M:%S %z")
       dest.write("#{ip} - - [#{date}] \"GET /test.#{ext} HTTP/1.1\" " +
                  "#{resp_code} #{resp_size} \"-\" \"#{ua}\"\n")
     end
