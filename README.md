@@ -95,19 +95,7 @@ How to run in local mode:
   ${LOGSTASH_HOME}/bin/logstash agent -f shipper.conf #if using source
   ```
 
-3. Mock random apache log generation, following command will generate random http logs to `/tmp/apache.log` generating events at a rate of `30 events/sec`
-
-  ```
-  ruby random_log_gen.rb --file /tmp/apache.log --quantity 30
-  ```
-
-  There is also a scala variant of the random data generator, feel free to use either of them.
-
-  ```
-  ./RandomHttpLogGen.scala /tmp/apache.log 30
-  ```
-
-  Note: `random_log_gen.rb` can be found in project root dir, also change the values as required to match the logstash agent conf
+3. Mock random apache log generation from [here](https://github.com/ashrithr/http_events_gen)
 
 4. Start a local cassandra instance, for [installation instructions](http://wiki.apache.org/cassandra/GettingStarted)
 
