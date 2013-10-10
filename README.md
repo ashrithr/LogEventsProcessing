@@ -9,6 +9,8 @@ Log Processing storm topology for:
 
 from http logs and persist the events, this is a example storm-topology, illustrating integration between storm, kafka, logstash and cassandra
 
+![Storm Topology](https://dl.dropbox.com/s/7ihs48qrlu297li/storm-logevents-usecase.png)
+
 Dependencies:
 ============
 
