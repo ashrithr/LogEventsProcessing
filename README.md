@@ -1,3 +1,5 @@
+
+
 Description:
 ===========
 
@@ -25,7 +27,7 @@ Configuring Dependencies:
 
 ##LogStash:
 
-logstash does not has support for kafka input/output types yet, so built one using any of the following 2 steps:
+logstash does not have support for kafka input/output types yet, so built one using any of the following 2 steps:
 
 1. Install logstash with a branch that supports kafka:
 
